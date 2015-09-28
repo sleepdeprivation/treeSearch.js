@@ -1,0 +1,28 @@
+{
+  "name": "treeSearch",
+  "version": "0.0.1",
+  "description": "A tree search and some examples",
+  "main": "treeSearch.js",
+  "dependencies": {
+    "js-priority-queue": "~0.1.2",
+    "queue": "~3.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node eightQueens.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sleepdeprivation/uniformCostSearch.js.git"
+  },
+  "keywords": [
+    "uniform-cost-search",
+    "binary-tree-search",
+    "search"
+  ],
+  "author": "Christian Burke",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/sleepdeprivation/uniformCostSearch.js/issues"
+  }
+}
