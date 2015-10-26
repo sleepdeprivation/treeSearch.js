@@ -1,4 +1,4 @@
-var TreeSearch = require("./treeSearch.js");
+var TreeSearch = require("../treeSearch.js");
 
 
 //credit Mozilla MDN
@@ -8,6 +8,14 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+//credit random stack exchange user
+Array.prototype.max = function() {
+  return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+  return Math.min.apply(null, this);
+};
 
 
 //end credit
@@ -15,12 +23,12 @@ function getRandomInt(min, max) {
 
 /*
 
-		THE EIGHT QUEENS PROBLEM:
+		THE N QUEENS PROBLEM:
 
 */
 
 /*
-	Now that we have abstracted uniform cost search we will model the 8 queens problem
+	Now that we have abstracted uniform cost search we will model the N queens problem
 	to be handled by the search
 */
 
@@ -30,15 +38,23 @@ function getRandomInt(min, max) {
 */
 var BOARD = 
 [
-[2885,3391,1494,2404,981,1554,2512,3399],
-[3208,3417,3243,2684,164,1352,2673,1206],
-[450,559,2806,2632,344,2711,978,2073],
-[3235,3437,3398,1389,2916,2816,2407,793],
-[2240,3390,2322,2322,2461,662,2320,2661],
-[346,1719,127,607,1123,1735,576,904],
-[987,2834,3007,2501,3365,1578,422,1792],
-[1937,503,3308,113,122,2289,1765,2476],
-]; //[];
+[ 981,1299,1255, 456,1824,1215, 173, 479],
+[ 879, 763,1183, 344,1975,1434, 529, 925],
+[ 901,1636, 419, 459, 885, 447,1615,1941],
+[ 618,1074, 608, 878, 224, 237,  59,1102],
+[1025, 707, 949, 627, 521, 598,1872,1051],
+[1030,1893, 465,1861, 824, 643,1472, 467],
+[1648,1766,1702, 867,1199, 855, 985, 986],
+[1602,1109, 393, 373, 529,1024,1166,1258]
+];
+
+var BOARD_SIZE = BOARD.length;
+var BOARD_MIN = Infinity;
+var BOARD_MAX = -Infinity;
+for(var ii = 0; ii < BOARD.length; ii++){
+	BOARD_MIN = Math.min(BOARD_MIN, BOARD[ii].min());
+	BOARD_MAX = Math.max(BOARD_MAX, BOARD[ii].max());
+}
 
 /*
 for(var ii = 0; ii < 8; ii++){
@@ -50,24 +66,38 @@ for(var ii = 0; ii < 8; ii++){
 */
 
 
+
 /*
 	We'll keep these lightweight
 */
 function scoredBoard(row, array){
 	this.currentRowNumber = row;	//start on the first row
-	this.colNumbers = array; 	//we'll just keep pushing which column we picked, when we have 8 it's a winner
+	this.colNumbers = array; 	//we'll just keep pushing which column we picked, when we have BOARD_SIZE it's a winner
 	this.measure = function(){
 		if(this.colNumbers.length == 0){ return 0; }
+		//var h = 0;
+		//if(this.heuristic != undefined){ h = this.heuristic(); /*console.log("heuristic", h);*/}
 		return BOARD[this.currentRowNumber][this.colNumbers[this.colNumbers.length-1]];
 	}
 };
+
+var heuristic = function(){
+	var retval = 0.0;
+	for(var ii = this.colNumbers.length; ii < BOARD_SIZE; ii++){
+		retval += BOARD[ii].min();
+	}
+	return retval;
+}
 
 /*
 	We want to generator successor boards
 */
 function generateSuccessors(board){
 	var decisionRow = board.colNumbers.length;	//decision time
-	var winners = [true, true, true, true, true, true, true, true];	//we're all winners here
+	var winners = [];
+	for(var ii = 0; ii < BOARD_SIZE; ii++){
+		winners.push(true);	//we're all winners here
+	}
 	var COL, currentQueen;
 	for(var ii = 0; ii < board.colNumbers.length; ii++){
 		currentQueen = board.colNumbers[ii];
@@ -75,11 +105,11 @@ function generateSuccessors(board){
 		winners[currentQueen] = false;
 		//tricky, remove those diagonals
 		COL = currentQueen + (decisionRow-ii);	//down right
-		if(COL >= 0 && COL <= 7){
+		if(COL >= 0 && COL < BOARD_SIZE){
 			winners[COL] = false;
 		}
 		COL = currentQueen - (decisionRow-ii);	//down left
-		if(COL >= 0 && COL <= 7){
+		if(COL >= 0 && COL < BOARD_SIZE){
 			winners[COL] = false;
 		}
 	}
@@ -99,7 +129,7 @@ function generateSuccessors(board){
 }
 
 function checkWin(board){
-	return board.colNumbers.length >= 8;
+	return board.colNumbers.length >= BOARD_SIZE;
 }
 
 
@@ -111,8 +141,22 @@ var functionPack1 =
 	bb: true
 };
 
+console.log("performing UCS with branch and bound ");
 var queenSearcher = new TreeSearch(functionPack1);
-
 queenSearcher.UCS();
 
+console.log("performing UCS without branch and bound");
+functionPack1.bb = false;
+var queenSearcher = new TreeSearch(functionPack1);
+queenSearcher.UCS();
+
+console.log("performing A*");
+scoredBoard.prototype.heuristic = heuristic;
+//console.log(i);
+var queenSearcher = new TreeSearch(functionPack1);
+queenSearcher.UCS();
+
+//var queenSearcher = new TreeSearch(functionPack1);
+//console.log(queenSearcher.count);
+//console.log(queenSearcher.PUSH_COUNT);
 
