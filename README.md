@@ -6,10 +6,10 @@ Uniform Cost Search (with and without branch and bound)
 A*
 Breadth First Search
 
-###why?
+### why?
 Project for a class at university.
 
-###how?
+### how?
 There are some examples in the examples directory.
 
 In general, initialize tree search using 
